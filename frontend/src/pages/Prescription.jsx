@@ -1,11 +1,20 @@
 import React from "react";
 
-function OpdCaseSheetSlip({ generatedToken, setStep, setGeneratedToken }) {
+function OpdCaseSheetSlip({
+  generatedToken,
+  setStep = () => {},
+  setGeneratedToken = () => {},
+}) {
   // Fallbacks safe guarding agar dynamic data check up runtime par null mile
+  console.log("generatedToken ==> ", generatedToken);
+
   const tokenNumber = generatedToken?.tokenNumber || "10";
   const name = generatedToken?.name || "CHHOTU KUMAR";
   const age = generatedToken?.age || "23";
   const phone = generatedToken?.phone || "8920523259";
+  const gender = generatedToken?.gender || "Male";
+  const address = generatedToken?.address || "Address";
+
   const date = new Date().toLocaleDateString("en-IN");
   const handleDoneClick = () => {
     // Exact requested URL pe redirect karne ke liye:
@@ -94,7 +103,7 @@ function OpdCaseSheetSlip({ generatedToken, setStep, setGeneratedToken }) {
               लिंग:-
             </span>
             <span className="border-b border-dashed border-slate-400 w-full px-1">
-              M
+              {gender}
             </span>
           </div>
 
@@ -103,7 +112,7 @@ function OpdCaseSheetSlip({ generatedToken, setStep, setGeneratedToken }) {
               पता:-
             </span>
             <span className="border-b border-dashed border-slate-400 w-full px-1">
-              Sheikhpura, Bihar
+              {address}
             </span>
           </div>
           <div className="col-span-6 flex pl-2">
