@@ -1,0 +1,30 @@
+@import "tailwindcss";
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print\:w-full,
+  .print\:w-full * {
+    visibility: visible;
+  }
+  .print\:w-full {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm !important;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 5mm;
+  }
+
+  html,
+  body {
+    background: white;
+  }
+}
