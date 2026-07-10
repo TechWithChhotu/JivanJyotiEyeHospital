@@ -47,7 +47,7 @@ function Home() {
               </div>
               <div>
                 <h1 className="text-lg font-black text-slate-900 tracking-tight leading-tight">
-                  Jeevan Jyoti Eye Hospital
+                  Jivan Jyoti Eye Hospital
                 </h1>
                 <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
                   Best Eye Care Hospital in Sheikhpura, Bihar
