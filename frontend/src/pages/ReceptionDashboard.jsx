@@ -1,20 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import OpdCaseSheetSlip from "./Prescription";
 
 function ReceptionDashboard() {
+  // 🔐 Security & Authentication States
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [counterId, setCounterId] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+
+  // 📝 Patient & Booking Flow States
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
-  const [gender, setGender] = useState("M"); // Default 'M' rakha hai
+  const [gender, setGender] = useState("M");
   const [address, setAddress] = useState("");
   const [isOldPatient, setIsOldPatient] = useState(false);
   const [patientId, setPatientId] = useState(null);
   const [allocatedToken, setAllocatedToken] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  // Patient details ko state me maintain karenge taaki render issue na ho
   const [patientPrintDetails, setPatientPrintDetails] = useState(null);
+
+  // 🛡️ Security Credentials Configuration
+  const VALID_COUNTER_ID = "JJEH_Reception_1";
+  const VALID_PASSWORD = "JJEH@Reception2026";
+
+  // Check storage session on component initial mount
+  useEffect(() => {
+    const session = localStorage.getItem("jjeh_reception_session");
+    if (session === "authorized") {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  // 🔑 Submit Handler for Reception Login Barrier
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+    if (counterId === VALID_COUNTER_ID && password === VALID_PASSWORD) {
+      localStorage.setItem("jjeh_reception_session", "authorized");
+      setIsAuthenticated(true);
+      setLoginError("");
+    } else {
+      setLoginError("❌ Invalid Counter ID or Password. Try Again.");
+      setPassword("");
+    }
+  };
+
+  // 🚪 Secure Session Logout Handler
+  const handleLogout = () => {
+    localStorage.removeItem("jjeh_reception_session");
+    setIsAuthenticated(false);
+    setCounterId("");
+    setPassword("");
+  };
 
   // ऑटोमैटिक सर्च फ़ंक्शन जो 10 अंक होने पर कॉल होगा
   const autoSearch = async (phoneNumber) => {
@@ -25,8 +63,8 @@ function ReceptionDashboard() {
       );
       setName(res.data.name);
       setAge(res.data.age);
-      setGender(res.data.gender || "M"); // Server se gender mile toh thik, nahi toh 'M'
-      setAddress(res.data.address || ""); // Server se address backup fallback
+      setGender(res.data.gender || "M");
+      setAddress(res.data.address || "");
       setPatientId(res.data._id);
       setIsOldPatient(true);
     } catch (err) {
@@ -88,7 +126,6 @@ function ReceptionDashboard() {
       const serverToken = res.data.tokenNumber;
       setAllocatedToken(serverToken);
 
-      // Data object ko safely capture karke print object me save kar rahe hain
       setPatientPrintDetails({
         tokenNumber: serverToken,
         name: name.trim(),
@@ -108,24 +145,103 @@ function ReceptionDashboard() {
       setPatientId(null);
     } catch (err) {
       console.error(err);
+      alert("टोकन जनरेट करने में समस्या आई। कृपया सर्वर चेक करें।");
     }
   };
 
+  // 🛑 Barrier Layer 1: Render Professional Security Screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 font-sans">
+        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+          <div className="text-center space-y-2 mb-6">
+            <span className="text-4xl">🔒</span>
+            <h2 className="text-2xl font-black text-white tracking-tight">
+              Reception Counter Login
+            </h2>
+            <p className="text-xs text-slate-400 font-medium">
+              Enter counter credentials to access the JJEH Booking Dashboard.
+            </p>
+          </div>
+
+          <form onSubmit={handleLoginSubmit} className="space-y-4">
+            {/* Input 1: Counter ID */}
+            <div>
+              <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">
+                Counter ID / Username
+              </label>
+              <input
+                type="text"
+                required
+                value={counterId}
+                onChange={(e) => setCounterId(e.target.value)}
+                placeholder="e.g. JJEH_Reception_1"
+                className="w-full bg-slate-950 border border-slate-800 focus:border-blue-600 focus:outline-none rounded-xl px-4 py-3.5 text-sm font-bold text-white transition-all"
+              />
+            </div>
+
+            {/* Input 2: Password */}
+            <div>
+              <label className="block text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">
+                Secure Access Password
+              </label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••••••"
+                className="w-full bg-slate-950 border border-slate-800 focus:border-blue-600 focus:outline-none rounded-xl px-4 py-3.5 text-sm font-bold text-white tracking-widest transition-all"
+              />
+            </div>
+
+            {loginError && (
+              <p className="text-xs text-rose-500 font-bold bg-rose-950/20 border border-rose-900/30 px-3 py-2 rounded-lg text-center">
+                {loginError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-black text-sm uppercase tracking-wider py-3.5 rounded-xl transition-all cursor-pointer shadow-lg shadow-blue-600/10"
+            >
+              Verify & Unlock Counter ⚡
+            </button>
+          </form>
+
+          <div className="text-center pt-6 text-[10px] text-slate-500 font-medium">
+            Protected Session Protocol • JJEH Sheikhpura
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ✅ Barrier Layer 2: Secure Reception Dashboard Shell
   return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4 print:p-0 print:bg-white">
+    <div className="min-h-screen bg-slate-50 py-10 px-4 print:p-0 print:bg-white font-sans">
       <div className="max-w-xl mx-auto bg-white rounded-xl shadow-md border border-slate-100 overflow-hidden print:hidden">
-        <div className="bg-blue-900 px-6 py-4 text-white">
-          <h2 className="text-xl font-bold">
-            📋 रिसेप्शन काउंटर (बुकिंग पैनल)
-          </h2>
-          <p className="text-sm text-blue-200">जीवन ज्योति आँख अस्पताल</p>
+        {/* Header with Secure Logout Action */}
+        <div className="bg-blue-900 px-6 py-4 text-white flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-bold">
+              📋 रिसेप्शन काउंटर (बुकिंग पैनल)
+            </h2>
+            <p className="text-sm text-blue-200">जीवन ज्योति आँख अस्पताल</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="bg-blue-950/60 hover:bg-rose-900 hover:text-rose-200 border border-blue-800/80 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer text-blue-100"
+          >
+            Logout Counter 🚪
+          </button>
         </div>
 
         <div className="p-6 space-y-6">
           {/* ऑटो-सर्च मोबाइल नंबर इनपुट */}
           <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
             <label className="block text-sm font-semibold text-slate-700 mb-2">
-              मरीज का मोबाइल नंबर दर्ज करें:
+              मरीज का mobile नंबर दर्ज करें:
             </label>
             <div className="relative">
               <input

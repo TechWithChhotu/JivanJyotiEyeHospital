@@ -19,8 +19,8 @@ function App() {
         <main className="animate-fade-in">
           <Routes>
             <Route path="/" element={<Home />} />
+            {/* <Route path="/t2" element={<Prescription />} /> */}
             <Route path="/test" element={<SelfBookingKiosk />} />
-            <Route path="/t2" element={<Prescription />} />
 
             {/* 1. Receptionist Screen (Default Route) */}
             <Route path="/reception" element={<ReceptionDashboard />} />
@@ -30,6 +30,7 @@ function App() {
 
             {/* 3. Real-time Patient Tracker Screen 
                 मरीज QR कोड स्कैन करके सीधे इस URL पर आएगा (जैसे: /patient/Dr. S. Kumar/5) */}
+            <Route path="/patient" element={<SelfBookingKiosk />} />
             <Route path="/patient/:myTokenNumber" element={<PatientView />} />
           </Routes>
         </main>
