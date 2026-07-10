@@ -118,7 +118,7 @@ function Footer() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-medium text-slate-500">
           <div>
             © {currentYear}{" "}
-            <span className="text-slate-400">Jeevan Jyoti Eye Hospital</span>.
+            <span className="text-slate-400">Jivan Jyoti Eye Hospital</span>.
             All Rights Reserved.
           </div>
 
