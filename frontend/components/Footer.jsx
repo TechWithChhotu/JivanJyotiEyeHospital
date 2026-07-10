@@ -123,7 +123,7 @@ function Footer() {
           </div>
 
           <div className="flex items-center gap-1">
-            <span>Powered by</span>
+            <span>Designed & Automated by</span>
             <a
               href="https://techsolex.in/"
               target="_blank"
